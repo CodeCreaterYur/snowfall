@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>snowfall effect / Эффект снегопад</title>
+	<style>
+        body { margin: 0; overflow: hidden; background-color: blue;}
+        canvas { display: block; }
+        @media only screen and (max-width: 600px) {
+            body { background-color: pink; }
+        }
+    </style>
+</head>
+<body>
+	    <canvas id="snowCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('snowCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const snowflakes = [];
+
+        function createSnowflake() {
+            const x = Math.random() * canvas.width;
+            const y = 0;
+            const size = Math.random() * 5 + 2;
+            const speed = Math.random() * 1 + 0.5;
+            const opacity = Math.random();
+            const angle = Math.random() * Math.PI * 2;
+            snowflakes.push({ x, y, size, speed, opacity, angle });
+        }
+
+        function drawSnowflakes() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            snowflakes.forEach(flake => {
+                const newX = flake.x + Math.cos(flake.angle) * 10;
+                const newY = flake.y + Math.sin(flake.angle) * 10;
+                ctx.beginPath();
+                ctx.arc(newX, newY, flake.size, 0, Math.PI * 2);
+                ctx.fill();
+                flake.x = newX;
+                flake.y = newY;
+            });
+        }
+
+        function moveSnowflakes() {
+            snowflakes.forEach(flake => {
+                flake.y += flake.speed;
+                if (flake.y > canvas.height) {
+                    flake.y = 0;
+                }
+            });
+        }
+
+        function updateSnowfall() {
+            createSnowflake();
+            drawSnowflakes();
+            moveSnowflakes();
+        }
+
+        setInterval(updateSnowfall, 50);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        canvas.addEventListener('mousemove', (event) => {
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+
+            snowflakes.forEach(flake => {
+                const dx = mouseX - flake.x;
+                const dy = mouseY - flake.y;
+                flake.angle = Math.atan2(dy, dx);
+            });
+        });
+
+        canvas.addEventListener('touchmove', (event) => {
+            const touchX = event.touches[0].clientX;
+            const touchY = event.touches[0].clientY;
+
+            snowflakes.forEach(flake => {
+                const dx = touchX - flake.x;
+                const dy = touchY - flake.y;
+                flake.angle = Math.atan2(dy, dx);
+            });
+        });
+    </script>
+</body>
+</html>
